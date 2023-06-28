@@ -3,6 +3,33 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+
+//Mongoose Configuration
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+});
+
+const exerciseLogSchema = new mongoose.Schema({
+  description: { type: String, required: true },
+  duration: { type: Number, required: true },
+  date: { type: Date, required: true },
+});
+
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  logs: [exerciseLogSchema],
+});
+
+const ExerciseLog = mongoose.model('ExerciseLog', exerciseLogSchema);
+const User = mongoose.model("User", userSchema);
+
 
 app.use(cors());
 app.use(express.static("public"));
