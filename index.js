@@ -27,9 +27,8 @@ const userSchema = new mongoose.Schema({
   logs: [exerciseLogSchema],
 });
 
-const ExerciseLog = mongoose.model('ExerciseLog', exerciseLogSchema);
+const ExerciseLog = mongoose.model("ExerciseLog", exerciseLogSchema);
 const User = mongoose.model("User", userSchema);
-
 
 app.use(cors());
 app.use(express.static("public"));
@@ -40,21 +39,20 @@ app.get("/", (req, res) => {
 });
 app.post("/api/users", (req, res) => {
   const input = req.body.username;
-  const newUser = new User({username: input});
-  newUser.save()
-  .then((savedUser) => {
-    
-    res.json({
-      username: savedUser.username,
-      _id: savedUser._id,
-    });
-  
-    console.log('User saved successfully.');
-  })
-  .catch((error) => {
-    console.error('Error saving user:', error);
-  });
+  const newUser = new User({ username: input });
+  newUser
+    .save()
+    .then((savedUser) => {
+      res.json({
+        username: savedUser.username,
+        _id: savedUser._id,
+      });
 
+      console.log("User saved successfully.");
+    })
+    .catch((error) => {
+      console.error("Error saving user:", error);
+    });
 });
 
 app.post("/api/users/:_id/exercises", (req, res) => {
@@ -64,86 +62,104 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   const { description, duration, date } = req.body;
 
   User.findById(uid)
-  .exec()
-  .then((user) => {
-    if (!user) {
-      throw new Error('User not found');
-    }
+    .exec()
+    .then((user) => {
+      if (!user) {
+        throw new Error("User not found");
+      }
 
-    // Create a new exercise log with today's date
-    const exerciseLog = {
-      description: description,
-      duration: duration,
-      date: date? new Date(date): new Date(),
-    };
+      // Create a new exercise log with today's date
+      const exerciseLog = {
+        description: description,
+        duration: duration,
+        date: date ? new Date(date) : new Date(),
+      };
 
-    // Add the exercise log to the user's log array
-    user.logs.push(exerciseLog);
+      // Add the exercise log to the user's log array
+      user.logs.push(exerciseLog);
 
-    // Save the updated user object
-    return user.save();
+      // Save the updated user object
+      return user.save();
+    })
+    .then((user) => {
+      res.json({
+        username: user.username,
+        description: description,
+        duration: duration,
+        date: Date.toDateString(date),
+        _id: uid,
+      });
 
-  })
-  .then((user) => {
-    res.json({
-      username: user.username,
-      description: description,
-      duration: duration,
-      date: Date.toDateString(date),
-      _id: uid,
+      console.log("Exercise added to user log successfully.");
+    })
+    .catch((error) => {
+      console.error("Error adding exercise to user log:", error);
     });
-  
-    console.log('Exercise added to user log successfully.');
-  })
-  .catch((error) => {
-    console.error('Error adding exercise to user log:', error);
-  });
-
-
 });
 
 app.get("/api/users", (req, res) => {
   User.find({})
-  .select('-logs')
-  .exec()
-  .then((users) => {
-    console.log('Users:', users);
-    res.json(users );
-  })
-  .catch((error) => {
-    console.error('Error fetching users:', error);
-  });
+    .select("-logs")
+    .exec()
+    .then((users) => {
+      console.log("Users:", users);
+      res.json(users);
+    })
+    .catch((error) => {
+      console.error("Error fetching users:", error);
+    });
 });
 
 app.get("/api/users/:_id/logs", (req, res) => {
-
   // If query is blank, return all exercises for the user
   const uid = req.params._id;
-  const from = req.query.from;// yyyy-mm-dd
-  const to = req.query.to;// yyyy-mm-dd
+  const from = req.query.from; // yyyy-mm-dd
+  const to = req.query.to; // yyyy-mm-dd
   const limit = req.query.limit;
-  console.log(
-    "query",
-    JSON.stringify({
-      query: {
-        from: from,
-        to: to,
-        limit: limit,
-      },
-    })
-  );
-  res.json({
-    username: uid,
-    count: 1,
-    _id: "5fb5853f734231456ccb3b05",
-    log: [
-      {
-        description: "test",
-        duration: 60,
-        date: "Mon Jan 01 1990",
-      },
-    ],
-  });
+  if (limit === undefined || from === undefined || to === undefined) {
+    User.findById(uid)
+      .exec()
+      .then((user) => {
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        const exerciseLogs = user.logs;
+        console.log("Exercise logs for user:", exerciseLogs);
+        return res.json({
+          username: user.username,
+          count: exerciseLogs.length,
+          _id: uid,
+          log: exerciseLogs,
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching exercise logs:", error);
+      });
+  } else {
+    console.log(
+      "query",
+      JSON.stringify({
+        query: {
+          from: from,
+          to: to,
+          limit: limit,
+        },
+      })
+    );
+    res.json({
+      username: uid,
+      count: 1,
+      _id: "null",
+      log: [
+        {
+          description: "test",
+          duration: 60,
+          date: "Mon Jan 01 1990",
+        },
+      ],
+    });
+  }
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
