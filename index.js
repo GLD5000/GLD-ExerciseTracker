@@ -128,10 +128,13 @@ app.get("/api/users/:_id/logs", (req, res) => {
           throw new Error("User not found");
         }
 
-        const exerciseLogs = user.logs.map((x) => {
-          x.date = x.date.toDateString();
-          return x;
-        });
+        const exerciseLogs = user.logs.map((log) => {
+          return {
+            description: log.description,
+            duration: `${log.duration}`,
+            date: log.date.toDateString(),
+          };
+      });
         console.log("Exercise logs for user:", exerciseLogs);
         return res.json({
           username: user.username,
@@ -205,7 +208,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
           log: logs.map((log) => {
             return {
               description: log.description,
-              duration: log.duration,
+              duration: `${log.duration}`,
               date: log.date.toDateString(),
             };
           }),
