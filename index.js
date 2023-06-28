@@ -116,7 +116,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
   const fromDate = new Date(req.query.from); // yyyy-mm-dd
   const toDate = new Date(req.query.to); // yyyy-mm-dd
   const limit = req.query.limit;
-  if (limit === undefined || from === undefined || to === undefined) {
+  if (limit === undefined || fromDate === undefined || toDate === undefined) {
     User.findById(userId)
       .exec()
       .then((user) => {
