@@ -56,11 +56,8 @@ app.post("/api/users", (req, res) => {
 });
 
 app.post("/api/users/:_id/exercises", (req, res) => {
-  // Date is optional
-  // If date is missing today's date is used
   const userId = req.params._id;
   const { description, duration, date } = req.body;
-  console.log("date:", date);
   User.findById(userId)
     .exec()
     .then((user) => {
@@ -68,17 +65,14 @@ app.post("/api/users/:_id/exercises", (req, res) => {
         throw new Error("User not found");
       }
 
-      // Create a new exercise log with today's date
       const exerciseLog = {
         description: description,
         duration: duration,
         date: date ? new Date(date) : new Date(),
       };
 
-      // Add the exercise log to the user's log array
       user.logs.push(exerciseLog);
 
-      // Save the updated user object
       return user.save();
     })
     .then((user) => {
@@ -86,8 +80,8 @@ app.post("/api/users/:_id/exercises", (req, res) => {
         username: user.username,
         // logs: user.logs,
         description: description,
-        duration: duration,
-        date: new Date(date).toDateString(),
+        duration: Number(duration),
+        date: date ? new Date(date).toDateString() : new Date().toDateString(),
         _id: userId,
       });
 
