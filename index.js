@@ -89,7 +89,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
       username: user.username,
       description: description,
       duration: duration,
-      date: date,
+      date: Date.toDateString(date),
       _id: uid,
     });
   
@@ -103,7 +103,16 @@ app.post("/api/users/:_id/exercises", (req, res) => {
 });
 
 app.get("/api/users", (req, res) => {
-  res.json([{user:"user", _id: "idisodisodisod"}, {user2: "useiruiruriu", _id: "idisodisodisod"}] );
+  User.find({})
+  .select('-logs')
+  .exec()
+  .then((users) => {
+    console.log('Users:', users);
+    res.json(users );
+  })
+  .catch((error) => {
+    console.error('Error fetching users:', error);
+  });
 });
 
 app.get("/api/users/:_id/logs", (req, res) => {
