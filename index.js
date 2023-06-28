@@ -115,7 +115,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
   const userId = req.params._id;
   const fromDate = new Date(req.query.from); // yyyy-mm-dd
   const toDate = new Date(req.query.to); // yyyy-mm-dd
-  const limit = req.query.limit;
+  const limit = Number(req.query.limit);
   if (limit === undefined || fromDate === undefined || toDate === undefined) {
     User.findById(userId)
       .exec()
@@ -150,13 +150,14 @@ app.get("/api/users/:_id/logs", (req, res) => {
         },
       })
     );
+    const returnObject = {_id: userId};
     User.findById(userId)
       .exec()
       .then((user) => {
         if (!user) {
           throw new Error("User not found");
         }
-        res.json({ username: user.name, _id: userId });
+        returnObject.username = user.name
         return ExerciseLog.find({ user: userId })
           .where("date")
           .gte(fromDate)
@@ -166,7 +167,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
       })
       .then((logs) => {
         console.log("Exercise logs:", logs);
-        res.json({
+        res.json({...returnObject,
           count: logs.length,
           log: logs.map((x) => {
             x.date = x.date.toDateString();
