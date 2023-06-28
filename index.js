@@ -20,6 +20,8 @@ app.post("/api/users", (req, res) => {
 });
 
 app.post("/api/users/:_id/exercises", (req, res) => {
+  // Date is optional
+  // If date is missing today's date is used
   const uid = req.params._id;
   const { description, duration, date } = req.body;
   res.json({
@@ -31,16 +33,27 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   });
 });
 
+app.get("/api/users", (req, res) => {
+  res.json([{user:"user", _id: "idisodisodisod"}, {user2: "useiruiruriu", _id: "idisodisodisod"}] );
+});
+
 app.get("/api/users/:_id/logs", (req, res) => {
+
+  // If query is blank, return all exercises for the user
   const uid = req.params._id;
-  const from = req.query.from;
-  const to = req.query.to;
+  const from = req.query.from;// yyyy-mm-dd
+  const to = req.query.to;// yyyy-mm-dd
   const limit = req.query.limit;
-  console.log("query", JSON.stringify({query: {
-    from: from,
-    to: to,
-    limit: limit
-  }}))
+  console.log(
+    "query",
+    JSON.stringify({
+      query: {
+        from: from,
+        to: to,
+        limit: limit,
+      },
+    })
+  );
   res.json({
     username: uid,
     count: 1,
