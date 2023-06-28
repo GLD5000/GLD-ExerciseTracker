@@ -116,7 +116,10 @@ app.get("/api/users/:_id/logs", (req, res) => {
   const queryFrom = req.query.from; // yyyy-mm-dd
   const queryTo = req.query.to; // yyyy-mm-dd
   const queryLimit = req.query.limit;
-  const queryEmpty = queryFrom === undefined || queryTo === undefined || queryLimit === undefined;
+  const queryEmpty =
+    queryFrom === undefined ||
+    queryTo === undefined ||
+    queryLimit === undefined;
   if (queryEmpty) {
     User.findById(userId)
       .exec()
@@ -141,10 +144,10 @@ app.get("/api/users/:_id/logs", (req, res) => {
         console.error("Error fetching exercise logs:", error);
       });
   } else {
-    const fromDate = fromDate? new Date(queryFrom): undefined; // yyyy-mm-dd
-    const toDate = toDate? new Date(queryTo): undefined; // yyyy-mm-dd
-    const limit = limit? Number(queryLimit): undefined;
-  
+    const fromDate = new Date(queryFrom); // yyyy-mm-dd
+    const toDate = new Date(queryTo); // yyyy-mm-dd
+    const limit = Number(queryLimit);
+
     console.log(
       "query",
       JSON.stringify({
@@ -155,28 +158,56 @@ app.get("/api/users/:_id/logs", (req, res) => {
         },
       })
     );
-    const returnObject = {_id: userId};
+    const returnObject = { _id: userId };
+    // User.findById(userId)
+    //   .exec()
+    //   .then((user) => {
+    //     if (!user) {
+    //       throw new Error("User not found");
+    //     }
+    //     returnObject.username = user.name
+    //     return ExerciseLog.find({ User: userId })
+    //       .where("date")
+    //       .gte(fromDate)
+    //       .lte(toDate)
+    //       .limit(limit)
+    //       .exec();
+    //   })
+    //   .then((logs) => {
+    //     console.log("Exercise logs:", logs);
+    //     res.json({...returnObject,
+    //       count: logs.length,
+    //       log: logs.map((x) => {
+    //         x.date = x.date.toDateString();
+    //         console.log('x:', x);
+    //         return x;
+    //       }),
+    //     });
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching exercise logs:", error);
+    //   });
     User.findById(userId)
       .exec()
       .then((user) => {
         if (!user) {
           throw new Error("User not found");
         }
-        returnObject.username = user.name
-        return ExerciseLog.find({ user: userId })
-          .where("date")
-          .gte(fromDate)
-          .lte(toDate)
-          .limit(limit)
-          .exec();
-      })
-      .then((logs) => {
-        console.log("Exercise logs:", logs);
-        res.json({...returnObject,
+
+        const logs = user.logs
+          .filter((log) => log.date >= fromDate && log.date <= toDate)
+          .slice(0, limit);
+
+        // console.log("Exercise logs:", logs);
+        res.json({
+          username: user.username,
           count: logs.length,
-          log: logs.map((x) => {
-            x.date = x.date.toDateString();
-            return x;
+          log: logs.map((log) => {
+            return {
+              description: log.description,
+              duration: log.duration,
+              date: log.date.toDateString(),
+            };
           }),
         });
       })
