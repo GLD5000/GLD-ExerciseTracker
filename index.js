@@ -60,7 +60,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   // If date is missing today's date is used
   const userId = req.params._id;
   const { description, duration, date } = req.body;
-
+console.log('date:', date);
   User.findById(userId)
     .exec()
     .then((user) => {
@@ -86,7 +86,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
         username: user.username,
         description: description,
         duration: duration,
-        date: Date.toDateString(date),
+        date: new Date(date).toDateString(),
         _id: userId,
       });
 
