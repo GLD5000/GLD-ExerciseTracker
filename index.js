@@ -141,8 +141,8 @@ app.get("/api/users/:_id/logs", (req, res) => {
       "query",
       JSON.stringify({
         query: {
-          from: from,
-          to: to,
+          from: fromDate,
+          to: toDate,
           limit: limit,
         },
       })
