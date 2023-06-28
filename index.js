@@ -58,10 +58,10 @@ app.post("/api/users", (req, res) => {
 app.post("/api/users/:_id/exercises", (req, res) => {
   // Date is optional
   // If date is missing today's date is used
-  const uid = req.params._id;
+  const userId = req.params._id;
   const { description, duration, date } = req.body;
 
-  User.findById(uid)
+  User.findById(userId)
     .exec()
     .then((user) => {
       if (!user) {
@@ -87,7 +87,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
         description: description,
         duration: duration,
         date: Date.toDateString(date),
-        _id: uid,
+        _id: userId,
       });
 
       console.log("Exercise added to user log successfully.");
@@ -129,7 +129,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
         return res.json({
           username: user.username,
           count: exerciseLogs.length,
-          _id: uid,
+          _id: userId,
           log: exerciseLogs,
         });
       })
@@ -153,7 +153,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
         if (!user) {
           throw new Error("User not found");
         }
-        res.json({ username: user.name, _id: uid });
+        res.json({ username: user.name, _id: userId });
         return ExerciseLog.find({ user: userId })
           .where("date")
           .gte(fromDate)
