@@ -40,10 +40,21 @@ app.get("/", (req, res) => {
 });
 app.post("/api/users", (req, res) => {
   const input = req.body.username;
-  res.json({
-    username: input,
-    _id: "resultant ID",
+  const newUser = new User({username: input});
+  newUser.save()
+  .then((savedUser) => {
+    
+    res.json({
+      username: savedUser.username,
+      _id: savedUser._id,
+    });
+  
+    console.log('User saved successfully.');
+  })
+  .catch((error) => {
+    console.error('Error saving user:', error);
   });
+
 });
 
 app.post("/api/users/:_id/exercises", (req, res) => {
