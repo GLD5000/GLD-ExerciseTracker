@@ -131,7 +131,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
 
         const exerciseLogs = user.logs.map((log) => {
           return {
-            description: log.description,
+            description: `${log.description}`,
             duration: log.duration,
             date: log.date.toDateString(),
           };
@@ -208,7 +208,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
           count: `${logs.length}`,
           log: logs.map((log) => {
             return {
-              description: log.description,
+              description: `${log.description}`,
               duration: log.duration,
               date: log.date.toDateString(),
             };
