@@ -62,13 +62,44 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   // If date is missing today's date is used
   const uid = req.params._id;
   const { description, duration, date } = req.body;
-  res.json({
-    username: "fcc_test",
-    description: description,
-    duration: duration,
-    date: date,
-    _id: uid,
+
+  User.findById(uid)
+  .exec()
+  .then((user) => {
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Create a new exercise log with today's date
+    const exerciseLog = {
+      description: description,
+      duration: duration,
+      date: date? new Date(date): new Date(),
+    };
+
+    // Add the exercise log to the user's log array
+    user.logs.push(exerciseLog);
+
+    // Save the updated user object
+    return user.save();
+
+  })
+  .then((user) => {
+    res.json({
+      username: user.username,
+      description: description,
+      duration: duration,
+      date: date,
+      _id: uid,
+    });
+  
+    console.log('Exercise added to user log successfully.');
+  })
+  .catch((error) => {
+    console.error('Error adding exercise to user log:', error);
   });
+
+
 });
 
 app.get("/api/users", (req, res) => {
