@@ -82,9 +82,13 @@ app.post("/api/users/:_id/exercises", (req, res) => {
       return user.save();
     })
     .then((user) => {
-      res.json({...user,
+      res.json({
+        username: user.username,
+        logs: user.logs,
+        description: description,
         duration: duration,
         date: new Date(date).toDateString(),
+        _id: userId,
       });
 
       console.log("Exercise added to user log successfully.");
