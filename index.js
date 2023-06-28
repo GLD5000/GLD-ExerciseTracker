@@ -113,9 +113,9 @@ app.get("/api/users", (req, res) => {
 app.get("/api/users/:_id/logs", (req, res) => {
   // If query is blank, return all exercises for the user
   const userId = req.params._id;
-  const fromDate = new Date(req.query.from); // yyyy-mm-dd
-  const toDate = new Date(req.query.to); // yyyy-mm-dd
-  const limit = Number(req.query.limit);
+  const fromDate = fromDate? new Date(req.query.from): undefined; // yyyy-mm-dd
+  const toDate = toDate? new Date(req.query.to): undefined; // yyyy-mm-dd
+  const limit = limit? Number(req.query.limit): undefined;
   if (limit === undefined || fromDate === undefined || toDate === undefined) {
     User.findById(userId)
       .exec()
