@@ -112,12 +112,12 @@ app.get("/api/users", (req, res) => {
 
 app.get("/api/users/:_id/logs", (req, res) => {
   // If query is blank, return all exercises for the user
-  const uid = req.params._id;
-  const from = req.query.from; // yyyy-mm-dd
-  const to = req.query.to; // yyyy-mm-dd
+  const userId = req.params._id;
+  const fromDate = new Date(req.query.from); // yyyy-mm-dd
+  const toDate = new Date(req.query.to); // yyyy-mm-dd
   const limit = req.query.limit;
   if (limit === undefined || from === undefined || to === undefined) {
-    User.findById(uid)
+    User.findById(userId)
       .exec()
       .then((user) => {
         if (!user) {
@@ -147,18 +147,27 @@ app.get("/api/users/:_id/logs", (req, res) => {
         },
       })
     );
-    res.json({
-      username: uid,
-      count: 1,
-      _id: "null",
-      log: [
-        {
-          description: "test",
-          duration: 60,
-          date: "Mon Jan 01 1990",
-        },
-      ],
-    });
+    User.findById(userId)
+      .exec()
+      .then((user) => {
+        if (!user) {
+          throw new Error("User not found");
+        }
+        res.json({ username: user.name, _id: uid });
+        return ExerciseLog.find({ user: userId })
+          .where("date")
+          .gte(fromDate)
+          .lte(toDate)
+          .limit(limit)
+          .exec();
+      })
+      .then((logs) => {
+        console.log("Exercise logs:", logs);
+        res.json({ count: logs.length, log: logs });
+      })
+      .catch((error) => {
+        console.error("Error fetching exercise logs:", error);
+      });
   }
 });
 
