@@ -60,7 +60,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   // If date is missing today's date is used
   const userId = req.params._id;
   const { description, duration, date } = req.body;
-console.log('date:', date);
+  console.log("date:", date);
   User.findById(userId)
     .exec()
     .then((user) => {
@@ -124,7 +124,10 @@ app.get("/api/users/:_id/logs", (req, res) => {
           throw new Error("User not found");
         }
 
-        const exerciseLogs = user.logs;
+        const exerciseLogs = user.logs.map((x) => {
+          x.date = x.date.toDateString();
+          return x;
+        });
         console.log("Exercise logs for user:", exerciseLogs);
         return res.json({
           username: user.username,
@@ -163,7 +166,13 @@ app.get("/api/users/:_id/logs", (req, res) => {
       })
       .then((logs) => {
         console.log("Exercise logs:", logs);
-        res.json({ count: logs.length, log: logs });
+        res.json({
+          count: logs.length,
+          log: logs.map((x) => {
+            x.date = x.date.toDateString();
+            return x;
+          }),
+        });
       })
       .catch((error) => {
         console.error("Error fetching exercise logs:", error);
