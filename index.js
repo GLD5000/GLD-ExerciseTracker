@@ -139,7 +139,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
         console.log("Exercise logs for user:", exerciseLogs);
         return res.json({
           username: user.username,
-          count: exerciseLogs.length,
+          count: `${exerciseLogs.length}`,
           _id: userId,
           log: exerciseLogs,
         });
@@ -205,7 +205,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
         // console.log("Exercise logs:", logs);
         res.json({
           username: user.username,
-          count: logs.length,
+          count: `${logs.length}`,
           log: logs.map((log) => {
             return {
               description: log.description,
