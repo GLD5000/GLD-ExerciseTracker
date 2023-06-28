@@ -199,7 +199,8 @@ app.get("/api/users/:_id/logs", (req, res) => {
         // console.log("Exercise logs:", logs);
         res.json({
           username: user.username,
-          count: `${logs.length}`,
+          count: logs.length,
+          _id:userId,
           log: logs.map((log) => {
             return {
               description: `${log.description}`,
