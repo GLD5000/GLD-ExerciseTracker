@@ -113,10 +113,11 @@ app.get("/api/users", (req, res) => {
 app.get("/api/users/:_id/logs", (req, res) => {
   // If query is blank, return all exercises for the user
   const userId = req.params._id;
-  const fromDate = fromDate? new Date(req.query.from): undefined; // yyyy-mm-dd
-  const toDate = toDate? new Date(req.query.to): undefined; // yyyy-mm-dd
-  const limit = limit? Number(req.query.limit): undefined;
-  if (limit === undefined || fromDate === undefined || toDate === undefined) {
+  const queryFrom = req.query.from; // yyyy-mm-dd
+  const queryTo = req.query.to; // yyyy-mm-dd
+  const queryLimit = req.query.limit;
+  const queryEmpty = queryFrom === undefined || queryTo === undefined || queryLimit === undefined;
+  if (queryEmpty) {
     User.findById(userId)
       .exec()
       .then((user) => {
@@ -140,6 +141,10 @@ app.get("/api/users/:_id/logs", (req, res) => {
         console.error("Error fetching exercise logs:", error);
       });
   } else {
+    const fromDate = fromDate? new Date(queryFrom): undefined; // yyyy-mm-dd
+    const toDate = toDate? new Date(queryTo): undefined; // yyyy-mm-dd
+    const limit = limit? Number(queryLimit): undefined;
+  
     console.log(
       "query",
       JSON.stringify({
