@@ -112,8 +112,8 @@ app.get("/api/users/:_id/logs", (req, res) => {
   const queryTo = req.query.to; // yyyy-mm-dd
   const queryLimit = req.query.limit;
   const queryEmpty =
-    queryFrom === undefined ||
-    queryTo === undefined ||
+    queryFrom === undefined &&
+    queryTo === undefined &&
     queryLimit === undefined;
   if (queryEmpty) {
     User.findById(userId)
@@ -142,8 +142,8 @@ app.get("/api/users/:_id/logs", (req, res) => {
         console.error("Error fetching exercise logs:", error);
       });
   } else {
-    const fromDate = new Date(queryFrom); // yyyy-mm-dd
-    const toDate = new Date(queryTo); // yyyy-mm-dd
+    const fromDate = queryFrom? new Date(queryFrom): -Infinity; // yyyy-mm-dd
+    const toDate = queryTo? new Date(queryTo): Infinity; // yyyy-mm-dd
     const limit = Number(queryLimit);
 
     console.log(
@@ -194,7 +194,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
 
         const logs = user.logs
           .filter((log) => log.date >= fromDate && log.date <= toDate)
-          .slice(0, limit);
+          .slice(0, limit? limit: user.logs.length);
 
         // console.log("Exercise logs:", logs);
         res.json({
