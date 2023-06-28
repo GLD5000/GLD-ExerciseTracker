@@ -132,7 +132,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
         const exerciseLogs = user.logs.map((log) => {
           return {
             description: log.description,
-            duration: `${log.duration}`,
+            duration: log.duration,
             date: log.date.toDateString(),
           };
       });
@@ -209,7 +209,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
           log: logs.map((log) => {
             return {
               description: log.description,
-              duration: `${log.duration}`,
+              duration: log.duration,
               date: log.date.toDateString(),
             };
           }),
